@@ -1,0 +1,33 @@
+Year,County,NDVI
+2016,Fresno,0.46
+2016,Kern,0.54
+2016,Kings,0.5
+2016,Merced,0.54
+2016,Stanislaus,0.62
+2016,San Joaquin,0.59
+2016,Solano,0.54
+2016,Yolo,0.51
+2017,Fresno,0.51
+2017,Kern,0.54
+2017,Kings,0.44
+2017,Merced,0.65
+2017,Stanislaus,0.7
+2017,San Joaquin,0.66
+2017,Solano,0.74
+2017,Yolo,0.62
+2018,Fresno,0.51
+2018,Kern,0.51
+2018,Kings,0.43
+2018,Merced,0.51
+2018,San Joaquin,0.58
+2018,Solano,0.6
+2018,Stanislaus,0.58
+2018,Yolo,0.55
+2019,Kings,0.45
+2019,Kern,0.52
+2019,Merced,0.57
+2019,Fresno,0.56
+2019,San Joaquin,0.66
+2019,Solano,0.62
+2019,Stanislaus,0.65
+2019,Yolo,0.58
