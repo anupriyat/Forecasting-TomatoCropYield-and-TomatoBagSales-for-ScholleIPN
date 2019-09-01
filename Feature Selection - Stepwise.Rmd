@@ -1,0 +1,213 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+setwd("/Users/alisa.babikova/Downloads/")
+getwd()
+cross_sectional <- read.csv("cross_sectional.csv")
+cross_sectional <- cross_sectional[ ,-c(1,12,13) ]
+cross_sectional
+```
+
+
+```{r}
+require(olsrr)
+model <- lm(Yield.2016 ~ Avg_Temp + Avg_DewPoint + Avg_PrInt + Avg_PrProb+ Avg_Pressure+Avg_Sunlight+Min_Temp+ Min_DewPoint+Min_Pressure+Min_Sunlight+Max_Temp+Max_DewPoint+Max_PrInt+Max_PrProb+Max_Pressure+Max_Sunlight+Yield.2015,data = cross_sectional)
+ols_step_all_possible(model)
+
+full_model <- lm(Yield.2016 ~ Avg_Temp + Avg_DewPoint + Avg_PrInt + Avg_PrProb+ Avg_Pressure+Avg_Sunlight+Min_Temp+ Min_DewPoint+Min_Pressure+Min_Sunlight+Max_Temp+Max_DewPoint+Max_PrInt+Max_PrProb+Max_Pressure+Max_Sunlight+Yield.2015,data = cross_sectional)
+summary(full_model)
+step(full_model)
+partial_model <-lm(Yield.2016 ~ Avg_Temp + Min_Pressure+Max_Pressure,data = cross_sectional)
+summary(partial_model)
+
+partial_model2 <-lm(Yield.2016 ~ Max_Temp + Yield.2015,data = cross_sectional)
+summary(partial_model2)
+
+
+library(ggplot2)
+ggplot(cross_sectional,aes(x=Max_Pressure, y =  Yield.2016)) + geom_point()
+
+```
+
+
+
+
+```{r}
+library(corrgram)
+corrplot(predictors)
+
+library(corrplot)
+corrplot(data)
+head(data)
+cor(cross_sectional[,-c(1,12,13)])
+predictors <- cross_sectional[,-c(1,2,12,13)]
+cor(predictors)
+```
+
+### Weather_Yield Dataset
+
+```{r}
+setwd("/Users/alisa.babikova/Downloads/")
+getwd()
+weather_yield <- read.csv("weather_yield.csv")
+head(weather_yield)
+weather_yield <- weather_yield[,-c(1,2,12,13)]
+head(weather_yield)
+
+partial_model <- lm(Value ~ Avg_Temp+ Avg_DewPoint+Min_Temp+ Min_DewPoint+ Min_Pressure+ Max_Temp+Max_Pressure, data = weather_yield)
+summary(partial_model)
+
+ols_step_all_possible(partial_model)
+
+```
+
+```{r}
+partial_model2 <- lm(Value ~ Min_Pressure+Max_DewPoint + Max_PrInt + Min_DewPoint +Avg_PrInt, data = weather_yield)
+summary(partial_model2)
+
+ols_step_all_possible(partial_model2)
+```
+
+
+```{r}
+full_model <- lm(Value ~ Avg_Temp+Avg_DewPoint+Avg_PrInt+Avg_PrProb+Avg_Pressure+Avg_Sunlight+Min_Temp+Min_DewPoint+Min_Pressure+Min_Sunlight+Max_Temp+Max_DewPoint+Max_PrInt+Max_PrProb+Max_Pressure+Max_Sunlight, data = weather_yield)
+summary(full_model)
+
+ols_step_all_possible(full_model)
+```
+
+## Cross-sectional Dataset
+
+```{r}
+# Lasso
+partial_model3 <- lm(Yield.2016 ~ Max_Temp+Yield.2015, data = cross_sectional)
+summary(partial_model3)
+
+ols_step_all_possible(partial_model3)
+```
+
+```{r}
+forest_model <- lm(Yield.2016 ~ Min_DewPoint+ Max_DewPoint+Max_Temp+Avg_Sunlight+Max_PrProb, data = cross_sectional)
+summary(forest_model)
+
+ols_step_all_possible(forest_model)
+
+head(cross_sectional)
+#Min_DewPoint, Max_DewPoint, Max_Temp, Avg_Sunlight, Max_PrProb
+```
+
+```{r}
+setwd("/Users/alisa.babikova/Downloads/")
+getwd()
+data_2016 <- read.csv("weather_ndvi_2016.csv")
+data_2016
+
+data_2016 <- data_2016[ ,-c(1,2) ]
+data_2016
+```
+
+
+```{r}
+model_ndvi <- lm(Yield.2016 ~ Max_Temp+Avg_Sunlight+Max_PrProb+NDVI+Yield.2015, data = data_2016)
+summary(model_ndvi)
+
+ols_step_all_possible(model_ndvi)
+ols_step_both_aic(model_ndvi)
+
+
+
+
+model_all <- lm(Yield.2016 ~Max_Temp+Avg_Sunlight+Max_PrProb+NDVI+Yield.2015, data = data_2016)
+summary(model_all)
+
+ols_step_all_possible(model_all)
+ols_step_both_aic(model_all)
+```
+
+```{r}
+weather_ndvi_2016 <- read.csv("weather_ndvi_2016_updated.csv")
+weather_ndvi_2016
+
+weather_ndvi_2017 <- read.csv("weather_ndvi_2017_updated.csv")
+head(weather_ndvi_2017)
+```
+```{r}
+require(olsrr)
+# lasso picked the same coefficients for 2017
+# 2016
+model_lasso <- lm(Yield.2016 ~ Yield.2015 + Avg_DewPoint,data = weather_ndvi_2016)
+summary(model_lasso)
+
+ols_step_all_possible(model_lasso)
+ols_step_both_aic(model_lasso)
+
+# 2017
+model_lasso <- lm(Yield.2017 ~ Yield.2016 + Avg_DewPoint,data = weather_ndvi_2017)
+summary(model_lasso)
+
+ols_step_all_possible(model_lasso)
+ols_step_both_aic(model_lasso)
+
+# 2016
+model_rf <- lm(Yield.2016 ~ NDVI + Avg_PrProb + Max_DewPoint + Yield.2015 + Avg_Temp, data = weather_ndvi_2016)
+summary(model_rf)
+
+ols_step_all_possible(model_rf)
+ols_step_both_aic(model_rf)
+
+# 2017
+model_rf <- lm(Yield.2017 ~ NDVI+Min_Sunlight+Avg_PrProb+Max_PrInt+Min_Pressure, data = weather_ndvi_2017)
+summary(model_rf)
+
+ols_step_all_possible(model_rf)
+ols_step_both_aic(model_rf)
+
+step.model.rf <- stepAIC(model_rf, direction = "forward", trace = FALSE)
+summary(step.model.rf)
+
+# 2017
+model_3 <- lm(Yield.2017 ~ NDVI+Min_Sunlight+Avg_PrProb+Min_Pressure+Yield.2016 + Avg_DewPoint, data = weather_ndvi_2017)
+summary(model_3)
+ols_step_both_aic(model_3)
+step.model3 <- stepAIC(model_3, direction = "forward", trace = FALSE)
+summary(step.model3)
+
+#2016
+model_current <- lm(Yield.2016 ~ NDVI + Max_Temp + Avg_Sunlight + Max_PrProb + Yield.2015, data = weather_ndvi_2016)
+summary(model_current)
+ols_step_all_possible(model_current)
+
+#2017
+model_current <- lm(Yield.2017 ~ NDVI + Max_Temp + Avg_Sunlight + Max_PrProb + Yield.2016, data = weather_ndvi_2017)
+summary(model_current)
+ols_step_all_possible(model_current)
+step.model <- stepAIC(model_current, direction = "both", trace = FALSE)
+summary(step.model)
+
+library(MASS)
+step.model.rf <- stepAIC(model_rf, direction = "both", trace = FALSE)
+summary(step.model.rf)
+```
+
+```{r}
+install.packages(c('tinytex', 'rmarkdown'))
+tinytex::install_tinytex()
+# after restarting RStudio, confirm that you have LaTeX withtinytex:::is_tinytex()
+
+tinytex:::is_tinytex()
+
+
+
+if (!require("devtools")) install.packages("devtools", repos = "http://cran.rstudio.org")
+
+devtools::install_github("rstudio/bookdown")
+
+devtools::install_github("JustinMShea/phoenixdown")
+```
